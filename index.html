@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشغل الموسيقى - أغنيات حمدي</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .player-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        audio {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .song-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .song-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .song-item:hover {
+            background-color: #f9f9f9;
+        }
+        .current-song {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+        .download-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+        .no-songs {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <h1>مشغل أغنيات حمدي</h1>
+        <audio id="audio-player" controls></audio>
+        <ul id="song-list" class="song-list">
+            <!-- سيتم ملء القائمة بواسطة JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        // مجلد الموسيقى
+        const musicFolder = 'music/';
+        
+        // قائمة بأسماء الملفات الموسيقية
+        const songFiles = [
+            'فرحة حمدي (4).mp3',
+            'دبكة حماسية بمناسبة زفاف حمدي الحريبي.mp3',
+            'دبكة حماسية بمناسبة زفاف حمدي الحريبي (1).mp3',
+            'فرحة حمدي.mp3',
+            'عرسك حكاية.mp3',
+            'عرسك حكاية (1).mp3',
+            'فرحة حمدي (1).mp3'
+        ];
+        
+        const audioPlayer = document.getElementById('audio-player');
+        const songListElement = document.getElementById('song-list');
+        let currentSongIndex = 0;
+        
+        // عرض قائمة الأغاني
+        function displaySongList() {
+            songListElement.innerHTML = '';
+            
+            if (songFiles.length === 0) {
+                const noSongs = document.createElement('li');
+                noSongs.className = 'no-songs';
+                noSongs.textContent = 'لا توجد أغاني متاحة';
+                songListElement.appendChild(noSongs);
+                return;
+            }
+            
+            songFiles.forEach((song, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'song-item';
+                if (index === currentSongIndex) {
+                    listItem.classList.add('current-song');
+                }
+                
+                // اسم الأغنية
+                const songName = document.createElement('span');
+                songName.textContent = song.replace('.mp3', '');
+                listItem.appendChild(songName);
+                
+                // زر التنزيل
+                const downloadBtn = document.createElement('a');
+                downloadBtn.href = musicFolder + song;
+                downloadBtn.download = song;
+                downloadBtn.className = 'download-btn';
+                downloadBtn.textContent = 'تنزيل';
+                downloadBtn.addEventListener('click', (e) => e.stopPropagation());
+                listItem.appendChild(downloadBtn);
+                
+                listItem.addEventListener('click', () => {
+                    playSong(index);
+                });
+                
+                songListElement.appendChild(listItem);
+            });
+        }
+        
+        // تشغيل أغنية محددة
+        function playSong(index) {
+            currentSongIndex = index;
+            audioPlayer.src = musicFolder + songFiles[index];
+            audioPlayer.play();
+            displaySongList();
+        }
+        
+        // الانتقال إلى الأغنية التالية عند انتهاء الحالية
+        audioPlayer.addEventListener('ended', () => {
+            currentSongIndex = (currentSongIndex + 1) % songFiles.length;
+            playSong(currentSongIndex);
+        });
+        
+        // البدء بتشغيل أول أغنية عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            if (songFiles.length > 0) {
+                playSong(0);
+            }
+            displaySongList();
+        });
+    </script>
+</body>
+</html>
